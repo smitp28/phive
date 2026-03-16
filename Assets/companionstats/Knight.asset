@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6fa91f2dba3cdc469a3b386128a7c2e, type: 3}
+  m_Name: Knight
+  m_EditorClassIdentifier: Assembly-CSharp::CompanionStats
+  speed: 5
+  stopDistance: 1.5
+  detectionRadius: 8
+  maxHealth: 100
+  invincibilityTime: 0.5
+  attackDamage: 50
+  attackRange: 2
+  attackCooldown: 1

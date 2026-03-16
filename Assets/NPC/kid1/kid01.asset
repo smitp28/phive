@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: abbc69a54b0289545982bec1fb5b69a2, type: 3}
+  m_Name: kid01
+  m_EditorClassIdentifier: Assembly-CSharp::NPCDialogue
+  npcName: kid01
+  npcPortrait: {fileID: -65865359, guid: 79b872f2d224eee4f8a50fef5f08c168, type: 3}
+  dialogueLines:
+  - Pardon me, mighty adventurer
+  - Would you happen to spare some coins?
+  autoProgressLines: 0100
+  autoProgressDelay: 1.5
+  typingSpeed: 0.05

@@ -1,0 +1,10 @@
+dev-requirements.txt
+pyproject.toml
+opencv/__init__.py
+opencv/__main__.py
+opencv.egg-info/PKG-INFO
+opencv.egg-info/SOURCES.txt
+opencv.egg-info/dependency_links.txt
+opencv.egg-info/requires.txt
+opencv.egg-info/top_level.txt
+tests/test_opencv.py
