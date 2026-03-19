@@ -1,39 +1,26 @@
 using System.Collections;
 using UnityEngine;
 
-/// <summary>
-/// Robot Boss Controller — Top-Down 2D
-/// 
-/// States: Idle → Chase → MeleeAttack / Summon → repeat
-/// 
-/// SETUP INSTRUCTIONS:
-///  1. Attach this script to your Boss GameObject.
-///  2. Assign the Animator, Rigidbody2D, and skeletonPrefab in the Inspector.
-///  3. Create an empty child GameObject called "MeleeHitbox", add a CircleCollider2D
-///     (set as Trigger), and assign it to meleeHitbox. This is your invisible melee hit zone.
-///  4. Set the Boss layer to "Enemy" and Player layer to "Player".
-///  5. Tag your Player GameObject as "Player".
-/// </summary>
 public class BossController : MonoBehaviour
 {
-    // ── Inspector Fields ─────────────────────────────────────────────────────
+    // ── Inspector Fields ──────────────────────────────────────────
 
     [Header("References")]
     public Animator animator;
     public Rigidbody2D rb;
-    public Transform skeletonSpawnPoint;   // Where skeletons spawn (assign a child Transform)
-    public GameObject skeletonPrefab;       // Drag your Skeleton prefab here
-    public Collider2D meleeHitbox;          // Child GameObject with CircleCollider2D (Trigger)
+    public Transform skeletonSpawnPoint;
+    public GameObject skeletonPrefab;
+    public Collider2D meleeHitbox;
 
     [Header("Movement")]
     public float moveSpeed = 3f;
-    public float chaseRange = 10f;          // Distance at which boss starts chasing
-    public float stopDistance = 1.5f;       // Distance at which boss stops to attack
+    public float chaseRange = 10f;
+    public float stopDistance = 1.5f;
 
     [Header("Melee Attack")]
     public float meleeCooldown = 2f;
-    public float meleeWindupTime = 0.3f;    // Pause before hitbox activates
-    public float meleeActiveTime = 0.25f;   // How long hitbox stays on
+    public float meleeWindupTime = 0.3f;
+    public float meleeActiveTime = 0.25f;
     public int meleeDamage = 20;
 
     [Header("Summon")]
@@ -44,7 +31,7 @@ public class BossController : MonoBehaviour
     [Header("Boss Stats")]
     public int maxHealth = 500;
 
-    // ── Private State ─────────────────────────────────────────────────────────
+    // ── Private State ─────────────────────────────────────────────
 
     private enum BossState { Idle, Chase, MeleeAttack, Summon, Dead }
     private BossState currentState = BossState.Idle;
@@ -53,15 +40,18 @@ public class BossController : MonoBehaviour
     private int currentHealth;
     private float meleeTimer;
     private float summonTimer;
-    private bool isActing; // Prevents overlapping actions
+    private bool isActing;
 
-    // ── Animator Parameter Hashes (performance) ───────────────────────────────
-    private static readonly int AnimMoving   = Animator.StringToHash("isMoving");
-    private static readonly int AnimAttack   = Animator.StringToHash("meleeAttack");
-    private static readonly int AnimSummon   = Animator.StringToHash("summon");
-    private static readonly int AnimDead     = Animator.StringToHash("isDead");
+    // ── Animator Hashes ───────────────────────────────────────────
 
-    // ─────────────────────────────────────────────────────────────────────────
+    private static readonly int AnimMoving = Animator.StringToHash("isMoving");
+    private static readonly int AnimAttack = Animator.StringToHash("meleeAttack");
+    private static readonly int AnimSummon = Animator.StringToHash("summon");
+    private static readonly int AnimDead   = Animator.StringToHash("isDead");
+    private static readonly int AnimPosX   = Animator.StringToHash("PosX");
+    private static readonly int AnimPosY   = Animator.StringToHash("PosY");
+
+    // ─────────────────────────────────────────────────────────────
 
     void Start()
     {
@@ -87,11 +77,10 @@ public class BossController : MonoBehaviour
         HandleMovement(distToPlayer);
     }
 
-    // ── State Decision ────────────────────────────────────────────────────────
+    // ── State Decision ────────────────────────────────────────────
 
     void DecideState(float dist)
     {
-        // Priority: Summon > Melee > Chase > Idle
         if (summonTimer <= 0f && dist <= chaseRange)
         {
             StartCoroutine(SummonRoutine());
@@ -107,7 +96,7 @@ public class BossController : MonoBehaviour
         currentState = dist <= chaseRange ? BossState.Chase : BossState.Idle;
     }
 
-    // ── Movement ──────────────────────────────────────────────────────────────
+    // ── Movement ──────────────────────────────────────────────────
 
     void HandleMovement(float dist)
     {
@@ -115,28 +104,21 @@ public class BossController : MonoBehaviour
         {
             Vector2 direction = ((Vector2)player.position - rb.position).normalized;
             rb.MovePosition(rb.position + direction * moveSpeed * Time.deltaTime);
-            FlipTowardsPlayer();
+
+            // Update direction params — keep last value when stopped
+            animator.SetFloat(AnimPosX, direction.x);
+            animator.SetFloat(AnimPosY, direction.y);
             animator.SetBool(AnimMoving, true);
         }
         else
         {
             rb.linearVelocity = Vector2.zero;
             animator.SetBool(AnimMoving, false);
+            // PosX and PosY intentionally not reset — idle uses last direction
         }
     }
 
-    void FlipTowardsPlayer()
-    {
-        if (player == null) return;
-        float dir = player.position.x - transform.position.x;
-        transform.localScale = new Vector3(
-            Mathf.Abs(transform.localScale.x) * (dir < 0 ? -1 : 1),
-            transform.localScale.y,
-            transform.localScale.z
-        );
-    }
-
-    // ── Melee Attack ──────────────────────────────────────────────────────────
+    // ── Melee Attack ──────────────────────────────────────────────
 
     IEnumerator MeleeRoutine()
     {
@@ -147,21 +129,15 @@ public class BossController : MonoBehaviour
         rb.linearVelocity = Vector2.zero;
         animator.SetTrigger(AnimAttack);
 
-        // Wind-up pause (animation charging)
         yield return new WaitForSeconds(meleeWindupTime);
-
-        // Activate the invisible hitbox
         meleeHitbox.enabled = true;
         yield return new WaitForSeconds(meleeActiveTime);
         meleeHitbox.enabled = false;
 
-        // Short recovery before next action
         yield return new WaitForSeconds(0.3f);
-
         isActing = false;
     }
 
-    // Detect player inside melee hitbox
     void OnTriggerEnter2D(Collider2D other)
     {
         if (currentState == BossState.MeleeAttack && other.CompareTag("Player"))
@@ -171,7 +147,7 @@ public class BossController : MonoBehaviour
         }
     }
 
-    // ── Summon ────────────────────────────────────────────────────────────────
+    // ── Summon ────────────────────────────────────────────────────
 
     IEnumerator SummonRoutine()
     {
@@ -182,7 +158,7 @@ public class BossController : MonoBehaviour
         rb.linearVelocity = Vector2.zero;
         animator.SetTrigger(AnimSummon);
 
-        yield return new WaitForSeconds(0.6f); // Wait for summon animation
+        yield return new WaitForSeconds(0.6f);
 
         for (int i = 0; i < skeletonsPerSummon; i++)
         {
@@ -198,7 +174,7 @@ public class BossController : MonoBehaviour
         isActing = false;
     }
 
-    // ── Damage & Death ────────────────────────────────────────────────────────
+    // ── Damage & Death ────────────────────────────────────────────
 
     public void TakeDamage(int amount)
     {
@@ -221,7 +197,6 @@ public class BossController : MonoBehaviour
 
         animator.SetBool(AnimDead, true);
 
-        // Wait for death animation before destroying
         yield return new WaitForSeconds(2f);
         Destroy(gameObject);
     }
