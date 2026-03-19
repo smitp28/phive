@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6fa91f2dba3cdc469a3b386128a7c2e, type: 3}
   m_Name: Knight
   m_EditorClassIdentifier: Assembly-CSharp::CompanionStats
-  speed: 5
+  speed: 2
   stopDistance: 1.5
   detectionRadius: 8
-  maxHealth: 100
+  maxHealth: 500
   invincibilityTime: 0.5
   attackDamage: 50
   attackRange: 2
