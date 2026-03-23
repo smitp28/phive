@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f6fa91f2dba3cdc469a3b386128a7c2e, type: 3}
-  m_Name: Knight
+  m_Name: Dwarf
   m_EditorClassIdentifier: Assembly-CSharp::CompanionStats
-  speed: 4
-  stopDistance: 1.5
-  detectionRadius: 5
-  maxHealth: 100
-  invincibilityTime: 0.5
-  attackDamage: 10
-  attackRange: 2
-  attackCooldown: 1
+  speed: 2
+  stopDistance: 1
+  detectionRadius: 4
+  maxHealth: 300
+  invincibilityTime: 2
+  attackDamage: 30
+  attackRange: 1
+  attackCooldown: 2
