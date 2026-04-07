@@ -19,9 +19,12 @@ public class PlayerHealth : MonoBehaviour
 
     float invincibilityTimer;
 
+    public HealthBar healthBar;
+
     void Start()
     {
         CurrentHealth = stats.maxHealth;
+        healthBar.SetMaxHealth(stats.maxHealth);
     }
 
     void Update()
@@ -37,6 +40,7 @@ public class PlayerHealth : MonoBehaviour
         CurrentHealth = Mathf.Max(0, CurrentHealth - amount);
         invincibilityTimer = stats.invincibilityTime;
         onHealthChanged?.Invoke(CurrentHealth);
+        healthBar.SetHealth(CurrentHealth);
 
         if (CurrentHealth <= 0) Die();
     }
