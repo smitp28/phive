@@ -36,7 +36,7 @@ public class PlayerHealth : MonoBehaviour
     public void TakeDamage(int amount)
     {
         if (IsDead || invincibilityTimer > 0f) return;
-
+        
         CurrentHealth = Mathf.Max(0, CurrentHealth - amount);
         invincibilityTimer = stats.invincibilityTime;
         onHealthChanged?.Invoke(CurrentHealth);

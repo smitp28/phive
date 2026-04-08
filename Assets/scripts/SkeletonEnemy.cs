@@ -1,4 +1,6 @@
 using System.Collections;
+
+
 using UnityEngine;
 
 /// <summary>
@@ -86,18 +88,21 @@ public class SkeletonEnemy : MonoBehaviour
 
     // ── Contact Damage ────────────────────────────────────────────────────────
 
-    void OnCollisionStay2D(Collision2D collision)
+    void OnCollisionEnter2D(Collision2D collision)
     {
         if (isDead) return;
-        if (damageTimer > 0f) return;
+
 
         if (collision.gameObject.CompareTag("Player"))
         {
             PlayerHealth ph = collision.gameObject.GetComponent<PlayerHealth>();
+            Debug.Log("Skeleton hit player! Attempting to deal damage...");
             if (ph != null)
             {
+                
                 ph.TakeDamage(contactDamage);
                 damageTimer = damageCooldown;
+                
             }
         }
     }

@@ -34,7 +34,7 @@ public class CompanionAI : MonoBehaviour
     {
         if (health.IsDead || movement == null || stats == null) return;
 
-        Debug.Log($"[{name}] FixedUpdate running, isEnabled: {enabled}");
+    
 
         if (PartyManager.Instance != null)
             followTarget = PartyManager.Instance.ActiveMember?.transform;
@@ -58,7 +58,7 @@ public class CompanionAI : MonoBehaviour
         Collider2D[] hits = Physics2D.OverlapCircleAll(
             movement.Position, stats.detectionRadius, enemyLayer);
 
-        Debug.Log($"[{name}] Enemies found in radius: {hits.Length}");
+      
         Transform closest     = null;
         float     closestDist = Mathf.Infinity;
 
