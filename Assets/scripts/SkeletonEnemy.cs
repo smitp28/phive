@@ -1,20 +1,7 @@
 using System.Collections;
 using UnityEngine.Events;
-using UnityEngine.SceneManagement;
 using UnityEngine;
 
-/// <summary>
-/// Skeleton Mini-Enemy — Top-Down 2D
-/// 
-/// Spawned by the Boss. Chases the player, deals contact damage, and dies.
-/// 
-/// SETUP INSTRUCTIONS:
-///  1. Attach this to your Skeleton prefab.
-///  2. Assign Animator and Rigidbody2D.
-///  3. Tag Skeleton with "Enemy", Player with "Player".
-///  4. Add a Collider2D to the skeleton (not trigger) for physics collision.
-///  5. Optionally add a second child Collider2D set as Trigger for damage detection.
-/// </summary>
 public class SkeletonEnemy : MonoBehaviour
 {
     [Header("References")]
@@ -32,9 +19,7 @@ public class SkeletonEnemy : MonoBehaviour
 
     [Header("Detection")]
     public float detectionRange = 8f;
-    public HealthBar healthBar; // Fixed: was "Healthbar"
-
-    // ── Private ───────────────────────────────────────────────────────────────
+    public HealthBar healthBar;
 
     private Transform player;
     private int currentHealth;
@@ -42,8 +27,6 @@ public class SkeletonEnemy : MonoBehaviour
     private bool isDead;
 
     private static readonly int AnimMoving = Animator.StringToHash("isMoving");
-
-    // ─────────────────────────────────────────────────────────────────────────
 
     void Start()
     {
@@ -60,14 +43,12 @@ public class SkeletonEnemy : MonoBehaviour
         damageTimer -= Time.deltaTime;
 
         float dist = Vector2.Distance(transform.position, player.position);
-
+        
         if (dist <= detectionRange)
             ChasePlayer();
         else
             Idle();
     }
-
-    // ── Movement ──────────────────────────────────────────────────────────────
 
     void ChasePlayer()
     {
@@ -90,16 +71,13 @@ public class SkeletonEnemy : MonoBehaviour
         if (animator != null) animator.SetBool(AnimMoving, false);
     }
 
-    // ── Contact Damage ────────────────────────────────────────────────────────
-
-    void OnCollisionEnter2D(Collision2D collision)
+    void OnCollisionStay2D(Collision2D collision)
     {
         if (isDead) return;
 
-        if (collision.gameObject.CompareTag("Player"))
+        if (collision.gameObject.CompareTag("Player") && damageTimer <= 0f)
         {
             PlayerHealth ph = collision.gameObject.GetComponent<PlayerHealth>();
-            Debug.Log("Skeleton hit player! Attempting to deal damage...");
             if (ph != null)
             {
                 ph.TakeDamage(contactDamage);
@@ -107,8 +85,6 @@ public class SkeletonEnemy : MonoBehaviour
             }
         }
     }
-
-    // ── Damage & Death ────────────────────────────────────────────────────────
 
     public void TakeDamage(int amount)
     {

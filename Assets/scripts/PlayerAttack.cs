@@ -71,4 +71,9 @@ public class PlayerAttack : MonoBehaviour, ICompanionAttack
         SkeletonEnemy skeleton = other.GetComponentInParent<SkeletonEnemy>();
         if (skeleton != null) skeleton.TakeDamage((int)stats.attackDamage);
     }
+
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        OnHitboxTrigger(other);
+    }
 }
