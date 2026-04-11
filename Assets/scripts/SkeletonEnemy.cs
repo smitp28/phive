@@ -1,6 +1,6 @@
 using System.Collections;
-
-
+using UnityEngine.Events;
+using UnityEngine.SceneManagement;
 using UnityEngine;
 
 /// <summary>
@@ -25,10 +25,14 @@ public class SkeletonEnemy : MonoBehaviour
     public int maxHealth = 50;
     public float moveSpeed = 2f;
     public int contactDamage = 10;
-    public float damageCooldown = 1f;   // Seconds between hits on the player
+    public float damageCooldown = 1f;
+
+    [Header("Events")]
+    public UnityEvent<int> onHealthChanged;
 
     [Header("Detection")]
     public float detectionRange = 8f;
+    public HealthBar healthBar; // Fixed: was "Healthbar"
 
     // ── Private ───────────────────────────────────────────────────────────────
 
@@ -44,6 +48,7 @@ public class SkeletonEnemy : MonoBehaviour
     void Start()
     {
         currentHealth = maxHealth;
+        if (healthBar != null) healthBar.SetMaxHealth(maxHealth);
         GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
         if (playerObj != null) player = playerObj.transform;
     }
@@ -69,7 +74,6 @@ public class SkeletonEnemy : MonoBehaviour
         Vector2 direction = ((Vector2)player.position - rb.position).normalized;
         rb.MovePosition(rb.position + direction * moveSpeed * Time.deltaTime);
 
-        // Flip sprite
         float dir = player.position.x - transform.position.x;
         transform.localScale = new Vector3(
             Mathf.Abs(transform.localScale.x) * (dir < 0 ? -1 : 1),
@@ -92,17 +96,14 @@ public class SkeletonEnemy : MonoBehaviour
     {
         if (isDead) return;
 
-
         if (collision.gameObject.CompareTag("Player"))
         {
             PlayerHealth ph = collision.gameObject.GetComponent<PlayerHealth>();
             Debug.Log("Skeleton hit player! Attempting to deal damage...");
             if (ph != null)
             {
-                
                 ph.TakeDamage(contactDamage);
                 damageTimer = damageCooldown;
-                
             }
         }
     }
@@ -113,7 +114,9 @@ public class SkeletonEnemy : MonoBehaviour
     {
         if (isDead) return;
 
-        currentHealth -= amount;
+        currentHealth = Mathf.Max(0, currentHealth - amount);
+        onHealthChanged?.Invoke(currentHealth);
+        if (healthBar != null) healthBar.SetHealth(currentHealth);
 
         if (currentHealth <= 0)
             StartCoroutine(DieRoutine());
@@ -125,7 +128,6 @@ public class SkeletonEnemy : MonoBehaviour
         rb.linearVelocity = Vector2.zero;
         if (animator != null) animator.SetBool(AnimMoving, false);
 
-        // Disable colliders so player doesn't keep colliding with corpse
         foreach (Collider2D col in GetComponents<Collider2D>())
             col.enabled = false;
 
